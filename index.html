@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>自走くん</title>
+  <title>自立補助ツール</title>
   <style>
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -127,8 +127,8 @@
 <body>
 <div class="container">
   <div class="header">
-    <h1>自走くん</h1>
-    <p>やりとりサポート ＆ 引継ぎフォーム</p>
+    <h1>自立補助ツール</h1>
+    <p>報告・やりとりをサポートするツールです</p>
   </div>
 
   <div class="tab-bar">
@@ -146,30 +146,30 @@
     <div class="card">
       <div class="field">
         <label>何が起きたか・受け取った連絡の内容 <span class="req">*</span></label>
-        <textarea id="s-situation" rows="4" placeholder="例）モビイクスから5月以降のSNS運用をLINEのみに変更したいとの連絡が来ました。"></textarea>
+        <textarea id="s-situation" rows="4" placeholder="例）案件①において、○○から△△という連絡が来ました。"></textarea>
       </div>
       <div class="field">
         <label>自分はどう動こうと思っているか <span class="req">*</span></label>
-        <textarea id="s-action" rows="3" placeholder="例）LINE単体での見積もりを作成して16日までに先方に提出しようと思います。"></textarea>
+        <textarea id="s-action" rows="3" placeholder="例）案件①について、○○という対応を△△までに行おうと思います。"></textarea>
       </div>
       <div class="field" style="margin-bottom:0">
         <label>上長に何を確認・相談したいか</label>
-        <textarea id="s-question" rows="2" placeholder="例）見積もり金額の方向性を確認していただけますか？"></textarea>
+        <textarea id="s-question" rows="2" placeholder="例）上長①に○○の判断をお願いしたいです。"></textarea>
       </div>
     </div>
     <div class="card">
       <div class="g2">
         <div class="field" style="margin-bottom:0">
           <label>あなたの名前</label>
-          <input type="text" id="s-name" placeholder="例）田中">
+          <input type="text" id="s-name" placeholder="例）担当者①">
         </div>
         <div class="field" style="margin-bottom:0">
           <label>報告先（上長名）</label>
-          <input type="text" id="s-to" placeholder="例）小熊さん">
+          <input type="text" id="s-to" placeholder="例）上長①">
         </div>
       </div>
     </div>
-    <button class="primary" id="s-btn" onclick="runStaff()">報告文をチェック・生成する</button>
+    <button class="primary" id="s-btn" onclick="runStaff()">報告文を生成する</button>
     <div id="s-result" style="display:none;margin-top:1rem"></div>
   </div>
 
@@ -181,22 +181,22 @@
     <div class="card">
       <div class="field">
         <label>報告したい内容・起きていること <span class="req">*</span></label>
-        <textarea id="m-situation" rows="4" placeholder="例）今月の売上が予算比80%で着地しそう。主因はAKIND案件の受注が遅れたこと。来月は病院案件の入金が見込まれる。"></textarea>
+        <textarea id="m-situation" rows="4" placeholder="例）今月の売上が予算比○%で着地しそう。主因は案件①の受注が遅れたこと。来月は案件②の入金が見込まれる。"></textarea>
       </div>
       <div class="field">
         <label>自分としての見立て・対策</label>
-        <textarea id="m-action" rows="3" placeholder="例）来月の数字は回復見込みのため、今月単月の遅れとして処理できると判断しています。"></textarea>
+        <textarea id="m-action" rows="3" placeholder="例）来月の数字は回復見込みのため、今月単月の遅れとして処理できると判断しています。案件①は今週中に確定見込みです。"></textarea>
       </div>
       <div class="field" style="margin-bottom:0">
         <label>社長に判断・相談してほしいこと</label>
-        <textarea id="m-question" rows="2" placeholder="例）採用の進め方について相談したいです。"></textarea>
+        <textarea id="m-question" rows="2" placeholder="例）○○の進め方について相談したいです。"></textarea>
       </div>
     </div>
     <div class="card">
       <div class="g2">
         <div class="field" style="margin-bottom:0">
           <label>報告者名</label>
-          <input type="text" id="m-name" placeholder="例）小熊">
+          <input type="text" id="m-name" placeholder="例）報告者①">
         </div>
         <div class="field" style="margin-bottom:0">
           <label>報告の種類</label>
@@ -222,16 +222,16 @@
     <div class="card">
       <div class="field">
         <label>クライアントからの連絡文 <span class="req">*</span></label>
-        <textarea id="c-input" rows="6" placeholder="例）お世話になっております。先日ご提案いただいたLPの件ですが、予算の関係で一部修正をお願いしたいと思います。"></textarea>
+        <textarea id="c-input" rows="6" placeholder="例）お世話になっております。案件①の件ですが、○○という理由で△△をお願いしたいと思います。"></textarea>
       </div>
       <div class="g2">
         <div class="field" style="margin-bottom:0">
           <label>クライアント名・案件名</label>
-          <input type="text" id="c-client" placeholder="例）モビイクス / LP制作">
+          <input type="text" id="c-client" placeholder="例）クライアント① / 案件①">
         </div>
         <div class="field" style="margin-bottom:0">
           <label>現在の状況・背景</label>
-          <input type="text" id="c-context" placeholder="例）先週提案済み、社内確認待ちだった">
+          <input type="text" id="c-context" placeholder="例）先週提案済み、クライアント①の確認待ちだった">
         </div>
       </div>
     </div>
@@ -248,7 +248,7 @@
       <div class="g2">
         <div class="field" style="margin-bottom:0">
           <label>引継ぎ者名 <span class="req">*</span></label>
-          <input type="text" id="hk-from" placeholder="例）田中">
+          <input type="text" id="hk-from" placeholder="例）担当者①">
         </div>
         <div class="field" style="margin-bottom:0">
           <label>引継ぎ日</label>
@@ -334,8 +334,8 @@ async function runStaff() {
   const situation = v('s-situation'), action = v('s-action');
   if (!situation) { alert('何が起きたかを入力してください'); return; }
   if (!action) { alert('自分の動きを入力してください'); return; }
-  setBtnLoading('s-btn', true, '報告文をチェック・生成する');
-  const prompt = `あなたはWeb制作会社のベテランマネージャーです。以下のスタッフからの報告内容を分析し、上長への報告文を生成してください。
+  setBtnLoading('s-btn', true, '報告文を生成する');
+  const prompt = `あなたはWeb制作会社のベテランマネージャーです。スタッフが上長に報告する場面をサポートしてください。
 
 【状況・受け取った連絡】${situation}
 【自分の動き・考え】${action}
@@ -343,39 +343,57 @@ async function runStaff() {
 【報告者】${v('s-name') || 'スタッフ'}
 【報告先】${v('s-to') || '上長'}
 
-JSON形式のみで返答:
-{"score":"自走度スコア0-100の整数","score_comment":"スコアの理由1文","missing":["不足している視点（配列）"],"good":["良い点（配列）"],"report":"改善した報告文です・ます調200字","advice":"アドバイス1〜2文"}`;
+以下を生成してください：
+1. この状況でのベストな報告文の例（です・ます調・200字程度・自分の判断と動きが明確に入っているもの）
+2. 自分がこれからどう動くかの選択肢を3つ（それぞれ異なるアプローチで。選んだらそのまま上長に送れる報告文になること）
+
+JSON形式のみで返答（他の文字は一切不要）:
+{"best_report":"ベストな報告文の例","options":[{"label":"選択肢のラベル（10字以内）","description":"このアプローチの特徴（1文）","report":"この選択肢を選んだ場合の報告文（です・ます調・そのまま送れる形）"},{"label":"","description":"","report":""},{"label":"","description":"","report":""}]}`;
   try {
     const d = await callGemini(prompt);
-    const score = parseInt(d.score)||0;
-    const scoreColor = score>=70?'#27500A':score>=40?'#633806':'#791F1F';
-    const scoreBg = score>=70?'#EAF3DE':score>=40?'#FAEEDA':'#FCEBEB';
-    const scoreLabel = score>=70?'自走できています':score>=40?'もう少し自分の考えを':'情報の横流しになっています';
-    const missingHTML = (d.missing||[]).length>0?`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#633806;margin-bottom:6px">不足している視点</div>${(d.missing||[]).map(m=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #f5dbb3;color:#854F0B">・${m}</div>`).join('')}</div>`:'';
-    const goodHTML = (d.good||[]).length>0?`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#27500A;margin-bottom:6px">良い点</div>${(d.good||[]).map(g=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #c0dd97;color:#3B6D11">・${g}</div>`).join('')}</div>`:'';
+    window._staffOptions = d.options || [];
+    const optionsHTML = (d.options||[]).map((opt,i) => `
+      <div class="option-card" id="s-opt-${i}" onclick="selectStaffOption(${i})">
+        <div class="option-tag">選択肢 ${i+1}：${opt.label||''}</div>
+        <div style="font-size:12px;color:#555;margin-top:4px">${opt.description||''}</div>
+      </div>`).join('');
     document.getElementById('s-result').innerHTML = `
-      <div class="result-wrap"><div class="result-top"><div class="result-title">自走度チェック結果</div></div>
-      <div class="result-body">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding:12px;background:${scoreBg};border-radius:8px">
-          <div style="font-size:36px;font-weight:700;color:${scoreColor}">${score}</div>
-          <div><div style="font-size:11px;color:${scoreColor};font-weight:700">自走度スコア / 100</div>
-          <div style="font-size:13px;font-weight:700;color:${scoreColor};margin-top:2px">${scoreLabel}</div>
-          <div style="font-size:12px;color:#666;margin-top:2px">${d.score_comment||''}</div></div>
-        </div>
-        ${missingHTML}${goodHTML}
-      </div></div>
-      <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">改善した報告文</div>
-        <button class="copy-btn" id="s-copy" onclick="copyText('s-report-text','s-copy')">コピー</button></div>
+      <div class="result-wrap">
+        <div class="result-top"><div class="result-title">ベストな報告文の例</div>
+        <button class="copy-btn" id="s-best-copy" onclick="copyText('s-best-text','s-best-copy')">コピー</button></div>
         <div class="result-body">
-          <textarea class="editable-result" id="s-report-text">${d.report||''}</textarea>
-          <div style="margin-top:8px;padding:10px;background:#f5f5f3;border-radius:6px;font-size:12px;color:#666"><b style="color:#333">アドバイス：</b>${d.advice||''}</div>
+          <div style="font-size:11px;color:#666;margin-bottom:6px">こういう報告文が理想的です。参考にしてください。</div>
+          <textarea class="editable-result" id="s-best-text">${d.best_report||''}</textarea>
+        </div>
+      </div>
+      <div class="result-wrap" style="margin-top:10px">
+        <div class="result-top"><div class="result-title">自分の動き方の選択肢（タップして選ぶ）</div></div>
+        <div class="result-body">
+          <div style="display:grid;gap:6px;margin-bottom:1rem">${optionsHTML}</div>
+          <div id="s-reply-area" style="display:none">
+            <hr style="border:none;border-top:1px solid #eee;margin:1rem 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div style="font-size:12px;font-weight:700">報告文（編集してそのまま送れます）</div>
+              <button class="copy-btn" id="s-reply-copy" onclick="copyText('s-reply-text','s-reply-copy')">コピー</button>
+            </div>
+            <textarea class="editable-result" id="s-reply-text" rows="6"></textarea>
+          </div>
         </div>
       </div>`;
     document.getElementById('s-result').style.display='block';
     document.getElementById('s-result').scrollIntoView({behavior:'smooth',block:'start'});
-  } catch(e) { alert('エラーが発生しました。APIキーを確認してください。\n'+e.message); }
-  setBtnLoading('s-btn', false, '報告文をチェック・生成する');
+  } catch(e) { alert('エラーが発生しました。\n'+e.message); }
+  setBtnLoading('s-btn', false, '報告文を生成する');
+}
+
+function selectStaffOption(idx) {
+  document.querySelectorAll('[id^="s-opt-"]').forEach((el,i) => el.classList.toggle('selected', i===idx));
+  const opt = window._staffOptions?.[idx];
+  if (opt) {
+    document.getElementById('s-reply-text').value = opt.report || '';
+    document.getElementById('s-reply-area').style.display = 'block';
+    document.getElementById('s-reply-area').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
 }
 
 // ===== 上長 → 社長 =====
@@ -383,37 +401,64 @@ async function runManager() {
   const situation = v('m-situation');
   if (!situation) { alert('報告内容を入力してください'); return; }
   setBtnLoading('m-btn', true, '社長への報告文を生成する');
-  const prompt = `あなたは経営者の秘書兼アドバイザーです。以下の内容をもとに社長への報告文を生成してください。
+  const prompt = `あなたは経営者の右腕として社長への報告をサポートします。
 
 【報告内容】${situation}
 【見立て・対策】${v('m-action')||'なし'}
 【社長への相談】${v('m-question')||'なし'}
 【報告者】${v('m-name')||'上長'}　【種類】${v('m-type')||'報告'}
 
-JSON形式のみで返答:
-{"need_to_report":["必ず報告する項目"],"optional":["状況次第で報告"],"skip":["社長には不要な粒度"],"report":"社長への報告文です・ます調200〜300字","point":"社長が気にするポイント1文"}`;
+以下を生成してください：
+1. 社長への理想的な報告文の例（簡潔・的確・200〜300字・自分の判断と提案が入っているもの）
+2. 報告の切り口・アプローチを3つ（状況に応じて選べる異なるスタンスで）
+
+JSON形式のみで返答（他の文字は一切不要）:
+{"best_report":"ベストな報告文の例","options":[{"label":"切り口のラベル（10字以内）","description":"このアプローチの特徴（1文）","report":"この切り口での報告文（です・ます調・そのまま送れる形・200〜300字）"},{"label":"","description":"","report":""},{"label":"","description":"","report":""}]}`;
   try {
     const d = await callGemini(prompt);
-    const needHTML = (d.need_to_report||[]).map(i=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #9FE1CB;color:#085041">・${i}</div>`).join('');
-    const optHTML = (d.optional||[]).map(i=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #e0e0e0;color:#666">・${i}</div>`).join('');
-    const skipHTML = (d.skip||[]).map(i=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #f5dbb3;color:#854F0B">・${i}</div>`).join('');
+    window._managerOptions = d.options || [];
+    const optionsHTML = (d.options||[]).map((opt,i) => `
+      <div class="option-card" id="m-opt-${i}" onclick="selectManagerOption(${i})">
+        <div class="option-tag">切り口 ${i+1}：${opt.label||''}</div>
+        <div style="font-size:12px;color:#555;margin-top:4px">${opt.description||''}</div>
+      </div>`).join('');
     document.getElementById('m-result').innerHTML = `
-      <div class="result-wrap"><div class="result-top"><div class="result-title">報告粒度の整理</div></div>
-      <div class="result-body">
-        ${needHTML?`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#085041;margin-bottom:4px">必ず報告する</div>${needHTML}</div>`:''}
-        ${optHTML?`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#666;margin-bottom:4px">状況次第で報告</div>${optHTML}</div>`:''}
-        ${skipHTML?`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#854F0B;margin-bottom:4px">社長には不要な粒度</div>${skipHTML}</div>`:''}
-        ${d.point?`<div style="padding:10px;background:#FAEEDA;border-radius:6px;font-size:12px;color:#633806"><b>社長が気にするポイント：</b>${d.point}</div>`:''}
-      </div></div>
+      <div class="result-wrap">
+        <div class="result-top"><div class="result-title">ベストな報告文の例</div>
+        <button class="copy-btn" id="m-best-copy" onclick="copyText('m-best-text','m-best-copy')">コピー</button></div>
+        <div class="result-body">
+          <div style="font-size:11px;color:#666;margin-bottom:6px">社長が求めているレベルの報告文です。参考にしてください。</div>
+          <textarea class="editable-result" id="m-best-text">${d.best_report||''}</textarea>
+        </div>
+      </div>
       <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">社長への報告文</div>
-        <button class="copy-btn" id="m-copy" onclick="copyText('m-report-text','m-copy')">コピー</button></div>
-        <div class="result-body"><textarea class="editable-result" id="m-report-text">${d.report||''}</textarea></div>
+        <div class="result-top"><div class="result-title">報告の切り口（タップして選ぶ）</div></div>
+        <div class="result-body">
+          <div style="display:grid;gap:6px;margin-bottom:1rem">${optionsHTML}</div>
+          <div id="m-reply-area" style="display:none">
+            <hr style="border:none;border-top:1px solid #eee;margin:1rem 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div style="font-size:12px;font-weight:700">報告文（編集してそのまま送れます）</div>
+              <button class="copy-btn" id="m-reply-copy" onclick="copyText('m-reply-text','m-reply-copy')">コピー</button>
+            </div>
+            <textarea class="editable-result" id="m-reply-text" rows="6"></textarea>
+          </div>
+        </div>
       </div>`;
     document.getElementById('m-result').style.display='block';
     document.getElementById('m-result').scrollIntoView({behavior:'smooth',block:'start'});
   } catch(e) { alert('エラーが発生しました。\n'+e.message); }
   setBtnLoading('m-btn', false, '社長への報告文を生成する');
+}
+
+function selectManagerOption(idx) {
+  document.querySelectorAll('[id^="m-opt-"]').forEach((el,i) => el.classList.toggle('selected', i===idx));
+  const opt = window._managerOptions?.[idx];
+  if (opt) {
+    document.getElementById('m-reply-text').value = opt.report || '';
+    document.getElementById('m-reply-area').style.display = 'block';
+    document.getElementById('m-reply-area').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
 }
 
 // ===== 担当 ↔ クライアント =====
