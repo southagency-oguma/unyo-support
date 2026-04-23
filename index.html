@@ -6,6 +6,7 @@
   <title>自立補助ツール</title>
   <style>
 
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif; background: #F2F4F7; color: #1a1a1a; min-height: 100vh; font-size: 13px; }
 
@@ -74,10 +75,20 @@
     .badge-ok { background: #EAF3DE; color: #27500A; }
     .badge-warn { background: #FAEEDA; color: #633806; }
 
+    /* モードカード */
+    .mode-card { background: #fff; border: 1.5px solid #E8ECF0; border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.15s; text-align: center; }
+    .mode-card:hover { border-color: #378ADD; background: #F5F9FF; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(55,138,221,0.1); }
+    .mode-card.active { border-color: #378ADD; background: #EBF4FF; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+    .mode-icon { font-size: 20px; font-weight: 700; color: #378ADD; margin-bottom: 6px; }
+    .mode-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+    .mode-desc { font-size: 11px; color: #888; }
+
     @media (max-width: 640px) {
       .g2 { grid-template-columns: 1fr; }
       .tab { font-size: 11px; padding: 8px 4px; }
       .site-logo-sub { display: none; }
+      .mode-card { padding: 0.75rem 0.5rem; }
+      .mode-title { font-size: 12px; }
     }
   
 
@@ -119,6 +130,7 @@
     @media (max-width: 640px) {
       .project-fields, .g3, .deadline-wrap { grid-template-columns: 1fr; }
     }
+  
   </style>
 </head>
 <body>
@@ -126,174 +138,78 @@
   <div class="site-header-inner">
     <div class="site-logo">
       <div class="site-logo-mark">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
       </div>
       <span class="site-logo-name">自立補助ツール</span>
       <span class="site-logo-sub">South Agency</span>
     </div>
   </div>
 </header>
-<div class="container">
 
+<div class="container">
   <div class="tab-bar">
-    <button class="tab active" onclick="switchTab('approval')">承認申請</button>
-    <button class="tab" onclick="switchTab('staff')">報告サポート</button>
-    <button class="tab" onclick="switchTab('manager')">上長 → 社長</button>
-    <button class="tab" onclick="switchTab('client')">担当 ↔ クライアント</button>
+    <button class="tab active" onclick="switchTab('yaritori')">やり取りサポート</button>
     <button class="tab" onclick="switchTab('hikitsugi')">引継ぎフォーム</button>
   </div>
 
-  <!-- ===== 承認申請 ===== -->
-  <div id="tab-approval" class="section active">
-    <div style="background:#E6F1FB;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#0C447C;line-height:1.7">
-      「こういう連絡が来ました。確認お願いします。」はNGです。<br>
-      受け取った連絡と<b>自分がどう動くつもりか</b>を入力して、承認申請文を作成しましょう。
+  <!-- ===== やり取りサポート ===== -->
+  <div id="tab-yaritori" class="section active">
+
+    <!-- モード選択 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem">
+      <div class="mode-card active" id="mode-manager" onclick="selectMode('manager')">
+        <div class="mode-icon">↑</div>
+        <div class="mode-title">上長・社長へ</div>
+        <div class="mode-desc">報告・相談・確認</div>
+      </div>
+      <div class="mode-card" id="mode-client" onclick="selectMode('client')">
+        <div class="mode-icon">↔</div>
+        <div class="mode-title">クライアントへ</div>
+        <div class="mode-desc">返信・提案・確認</div>
+      </div>
+      <div class="mode-card" id="mode-member" onclick="selectMode('member')">
+        <div class="mode-icon">→</div>
+        <div class="mode-title">社内メンバーへ</div>
+        <div class="mode-desc">依頼・共有・確認</div>
+      </div>
     </div>
 
+    <!-- 入力フォーム -->
     <div class="card">
       <div class="field">
-        <label>受け取った連絡文 <span class="req">*</span></label>
-        <textarea id="ap-input" rows="5" placeholder="例）案件①において、○○から△△という連絡が来ました。"></textarea>
-      </div>
-    </div>
-
-    <div class="card highlight">
-      <div style="font-size:12px;font-weight:700;color:#0C447C;margin-bottom:10px">ここが一番大事です。自分で考えてから入力してください。</div>
-      <div class="field">
-        <label>この状況で、自分はどう動こうと思っているか <span class="req">*</span>（空欄だと申請文を作れません）</label>
-        <textarea id="ap-action" rows="3" placeholder="例）○○という対応で△△までに進めようと思います。理由は〜だからです。"></textarea>
+        <label id="situation-label">状況・背景（相手が読んだときに理解できる情報） <span class="req">*</span></label>
+        <textarea id="yt-situation" rows="4" placeholder="例）案件①において、○○から△△という連絡が来ました。現在の状況は〜です。"></textarea>
       </div>
       <div class="field">
-        <label>期限・スケジュール <span class="req">*</span>（空欄だと申請文を作れません）</label>
-        <input type="text" id="ap-deadline" placeholder="例）△△日までに○○を完了させる予定">
+        <label id="message-label">伝えたいこと・聞きたいこと <span class="req">*</span></label>
+        <textarea id="yt-message" rows="3" placeholder="例）○○の件について、△△という方向で進めようと思っています。確認をお願いしたいです。"></textarea>
       </div>
       <div class="field" style="margin-bottom:0">
-        <label>上長に判断・確認してほしいこと</label>
-        <textarea id="ap-question" rows="2" placeholder="例）この進め方で問題ないか確認をお願いしたいです。"></textarea>
+        <label>相手に何をしてほしいか（判断・承認・情報提供など）</label>
+        <input type="text" id="yt-action" placeholder="例）○○について判断・承認をいただきたいです">
       </div>
     </div>
 
     <div class="card">
       <div class="g2">
         <div class="field" style="margin-bottom:0">
-          <label>あなたの名前</label>
-          <input type="text" id="ap-name" placeholder="例）担当者①">
+          <label>送信者名</label>
+          <input type="text" id="yt-from" placeholder="例）担当者①">
         </div>
         <div class="field" style="margin-bottom:0">
-          <label>申請先（上長名）</label>
-          <input type="text" id="ap-to" placeholder="例）上長①">
+          <label id="to-label">送信先</label>
+          <input type="text" id="yt-to" placeholder="例）上長①">
         </div>
       </div>
     </div>
 
-    <button class="primary" id="ap-btn" onclick="runApproval()">承認申請文を生成する</button>
-    <div id="ap-result" style="display:none;margin-top:1rem"></div>
+    <button class="primary" id="yt-btn" onclick="runYaritori()">相手目線で文章を生成する</button>
+    <div id="yt-result" style="display:none;margin-top:1rem"></div>
   </div>
 
-  <!-- スタッフ → 上長 -->
-  <div id="tab-staff" class="section">
-    <div style="background:#E6F1FB;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#0C447C;line-height:1.6">
-      上長に報告・相談する前にここで確認しましょう。「情報の横流し」になっていないか、自分の考えが入っているかをチェックします。
-    </div>
-    <div class="card">
-      <div class="field">
-        <label>何が起きたか・受け取った連絡の内容 <span class="req">*</span></label>
-        <textarea id="s-situation" rows="4" placeholder="例）案件①において、○○から△△という連絡が来ました。"></textarea>
-      </div>
-      <div class="field">
-        <label>自分はどう動こうと思っているか <span class="req">*</span></label>
-        <textarea id="s-action" rows="3" placeholder="例）案件①について、○○という対応を△△までに行おうと思います。"></textarea>
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>上長に何を確認・相談したいか</label>
-        <textarea id="s-question" rows="2" placeholder="例）上長①に○○の判断をお願いしたいです。"></textarea>
-      </div>
-    </div>
-    <div class="card">
-      <div class="g2">
-        <div class="field" style="margin-bottom:0">
-          <label>あなたの名前</label>
-          <input type="text" id="s-name" placeholder="例）担当者①">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>報告先（上長名）</label>
-          <input type="text" id="s-to" placeholder="例）上長①">
-        </div>
-      </div>
-    </div>
-    <button class="primary" id="s-btn" onclick="runStaff()">報告文を生成する</button>
-    <div id="s-result" style="display:none;margin-top:1rem"></div>
-  </div>
-
-  <!-- 上長 → 社長 -->
-  <div id="tab-manager" class="section">
-    <div style="background:#EAF3DE;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#27500A;line-height:1.6">
-      社長への報告内容を整理します。何をどの粒度で報告すべきか迷ったときに使ってください。
-    </div>
-    <div class="card">
-      <div class="field">
-        <label>報告したい内容・起きていること <span class="req">*</span></label>
-        <textarea id="m-situation" rows="4" placeholder="例）今月の売上が予算比○%で着地しそう。主因は案件①の受注が遅れたこと。来月は案件②の入金が見込まれる。"></textarea>
-      </div>
-      <div class="field">
-        <label>自分としての見立て・対策</label>
-        <textarea id="m-action" rows="3" placeholder="例）来月の数字は回復見込みのため、今月単月の遅れとして処理できると判断しています。案件①は今週中に確定見込みです。"></textarea>
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>社長に判断・相談してほしいこと</label>
-        <textarea id="m-question" rows="2" placeholder="例）○○の進め方について相談したいです。"></textarea>
-      </div>
-    </div>
-    <div class="card">
-      <div class="g2">
-        <div class="field" style="margin-bottom:0">
-          <label>報告者名</label>
-          <input type="text" id="m-name" placeholder="例）報告者①">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>報告の種類</label>
-          <select id="m-type">
-            <option>週次報告</option>
-            <option>月次報告</option>
-            <option>案件報告</option>
-            <option>緊急報告</option>
-            <option>相談</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <button class="primary" id="m-btn" onclick="runManager()">社長への報告文を生成する</button>
-    <div id="m-result" style="display:none;margin-top:1rem"></div>
-  </div>
-
-  <!-- 担当 ↔ クライアント -->
-  <div id="tab-client" class="section">
-    <div style="background:#FAEEDA;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#633806;line-height:1.6">
-      クライアントからの連絡を貼り付けると、内容を整理して返し方の選択肢を複数提示します。
-    </div>
-    <div class="card">
-      <div class="field">
-        <label>クライアントからの連絡文 <span class="req">*</span></label>
-        <textarea id="c-input" rows="6" placeholder="例）お世話になっております。案件①の件ですが、○○という理由で△△をお願いしたいと思います。"></textarea>
-      </div>
-      <div class="g2">
-        <div class="field" style="margin-bottom:0">
-          <label>クライアント名・案件名</label>
-          <input type="text" id="c-client" placeholder="例）クライアント① / 案件①">
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>現在の状況・背景</label>
-          <input type="text" id="c-context" placeholder="例）先週提案済み、クライアント①の確認待ちだった">
-        </div>
-      </div>
-    </div>
-    <button class="primary" id="c-btn" onclick="runClient()">内容を分析して返し方を提案する</button>
-    <div id="c-result" style="display:none;margin-top:1rem"></div>
-  </div>
-
-  <!-- 引継ぎフォーム -->
+  <!-- ===== 引継ぎフォーム ===== -->
   <div id="tab-hikitsugi" class="section">
-    <div style="background:#f5f5f3;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666;line-height:1.6">
+    <div style="background:#F8F9FB;border:1px solid #E8ECF0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#666;line-height:1.6">
       フォームに入力してボタンを押すとSlackに貼れる引継ぎ文が生成されます
     </div>
     <div class="card">
@@ -317,8 +233,35 @@
 
 <script>
 const API_URL = '/api/claude';
+const TABS = ['yaritori', 'hikitsugi'];
+let currentMode = 'manager';
 
-const TABS = ['approval','staff','manager','client','hikitsugi'];
+const modeConfig = {
+  manager: {
+    situationLabel: '状況・背景（相手が読んだときに理解できる情報）',
+    messageLabel: '報告・相談したいこと',
+    toPlaceholder: '例）上長①・社長',
+    actionPlaceholder: '例）この方向性で進めてよいか確認をお願いしたいです',
+    aiRole: '上長や社長への報告・相談をサポートするプロフェッショナル',
+    aiContext: '報告・相談相手は上長または社長。判断・承認・情報提供を求める場面。'
+  },
+  client: {
+    situationLabel: '案件・状況の背景',
+    messageLabel: 'クライアントに伝えたいこと・返信内容',
+    toPlaceholder: '例）クライアント①',
+    actionPlaceholder: '例）ご確認・ご承認をお願いしたいです',
+    aiRole: 'Web制作会社のベテランディレクター',
+    aiContext: 'クライアントへの返信・提案・確認の場面。ビジネスライクかつ丁寧に。'
+  },
+  member: {
+    situationLabel: '依頼・共有の背景・状況',
+    messageLabel: '社内メンバーに伝えたいこと・依頼内容',
+    toPlaceholder: '例）メンバー①',
+    actionPlaceholder: '例）○○までに対応をお願いしたいです',
+    aiRole: 'Web制作会社のベテランマネージャー',
+    aiContext: '社内メンバーへの依頼・共有・確認の場面。明確で負担が少ない文章に。'
+  }
+};
 
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -329,6 +272,17 @@ function switchTab(name) {
       document.getElementById('tab-'+n).classList.add('active');
     }
   });
+}
+
+function selectMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-card').forEach(el => el.classList.remove('active'));
+  document.getElementById('mode-'+mode).classList.add('active');
+  const cfg = modeConfig[mode];
+  document.getElementById('situation-label').textContent = cfg.situationLabel + ' *';
+  document.getElementById('message-label').textContent = cfg.messageLabel + ' *';
+  document.getElementById('yt-to').placeholder = cfg.toPlaceholder;
+  document.getElementById('yt-action').placeholder = cfg.actionPlaceholder;
 }
 
 const v = id => (document.getElementById(id)?.value || '').trim();
@@ -364,7 +318,7 @@ function setBtnLoading(id, loading, defaultLabel, retrying = false, messages = [
     btn.innerHTML = defaultLabel;
     if (btn._msgInterval) { clearInterval(btn._msgInterval); delete btn._msgInterval; }
   } else if (retrying) {
-    btn.innerHTML = '<span class="spin"></span>制限中のため再試行中...';
+    btn.innerHTML = '<span class="spin"></span>再試行中...';
   } else if (messages.length > 0) {
     let i = 0;
     btn.innerHTML = '<span class="spin"></span>' + messages[0];
@@ -374,7 +328,7 @@ function setBtnLoading(id, loading, defaultLabel, retrying = false, messages = [
       else clearInterval(btn._msgInterval);
     }, 1800);
   } else {
-    btn.innerHTML = '<span class="spin"></span>AI分析中...';
+    btn.innerHTML = '<span class="spin"></span>生成中...';
   }
 }
 
@@ -390,270 +344,109 @@ function copyText(id, btnId) {
   });
 }
 
-// ===== 承認申請 =====
-async function runApproval() {
-  const input = v('ap-input');
-  const action = v('ap-action');
-  const deadline = v('ap-deadline');
-  if (!input) { alert('受け取った連絡文を入力してください'); return; }
-  if (!action) {
-    alert('「自分がどう動くか」は必ず入力してください。\nここが空欄では承認申請になりません。');
-    document.getElementById('ap-action').focus();
-    return;
-  }
-  if (!deadline) {
-    alert('期限・スケジュールを入力してください。\n上長が判断するために必要な情報です。');
-    document.getElementById('ap-deadline').focus();
-    return;
-  }
+// ===== やり取りサポート =====
+async function runYaritori() {
+  const situation = v('yt-situation');
+  const message = v('yt-message');
+  if (!situation) { alert('状況・背景を入力してください'); return; }
+  if (!message) { alert('伝えたいことを入力してください'); return; }
 
-  setBtnLoading('ap-btn', true, '承認申請文を生成する', false, ['状況を分析中...', '自立度をチェック中...', '申請文を作成中...']);
+  const cfg = modeConfig[currentMode];
+  const modeLabels = { manager: '上長・社長への報告・相談', client: 'クライアントへの返信・提案', member: '社内メンバーへの依頼・共有' };
 
-  const prompt = `あなたはWeb制作会社のベテランマネージャーです。スタッフが上長に承認申請をする場面をサポートしてください。
+  setBtnLoading('yt-btn', true, '相手目線で文章を生成する', false, [
+    '状況を整理中...', '相手の立場で考え中...', '読みやすい文章を生成中...'
+  ]);
 
-【受け取った連絡】${input}
-【自分の動き・考え】${action}
-【期限・スケジュール】${deadline}
-【上長への確認事項】${v('ap-question') || 'なし'}
-【申請者】${v('ap-name') || '担当者'}
-【申請先】${v('ap-to') || '上長'}
+  const prompt = `あなたは${cfg.aiRole}です。${cfg.aiContext}
+
+【送信者】${v('yt-from') || '担当者'}
+【送信先】${v('yt-to') || '相手'}
+【状況・背景】${situation}
+【伝えたいこと】${message}
+【相手にしてほしいこと】${v('yt-action') || '未記入'}
+【場面】${modeLabels[currentMode]}
 
 以下を生成してください：
-1. 承認申請文（「〜という対応で進めてよいですか？」という形式。自分の判断と動きが明確に入っていること。です・ます調・150〜200字）
-2. この申請文の良い点（担当者が自分で考えられている点を具体的に）
-3. もしあれば改善できる点（より良い申請にするためのアドバイス）
+1. 相手が読んで迷わない・負担が少ない文章（です・ます調・簡潔・要点が明確）
+2. 相手目線のフィードバック（この文章を受け取った相手はどう感じるか）
+3. 3つの送り方のバリエーション（状況に応じて選べる異なるトーン・アプローチで）
 
-JSON形式のみで返答（他の文字は一切不要）:
-{"approval":"承認申請文","good":["良い点（配列・最大3つ）"],"improve":["改善できる点（配列・なければ空配列）"]}`;
+以下のJSON形式のみで返答（他の文字は一切不要）:
+{"best":"ベストな文章","feedback":{"positive":"良い点（1文）","caution":"相手が負担に感じる可能性がある点（なければ空文字）","impression":"この文章を受け取った相手の印象（1文）"},"options":[{"label":"バリエーションのラベル（10字以内）","feature":"このアプローチの特徴（1文）","text":"このバリエーションの文章"},{"label":"","feature":"","text":""},{"label":"","feature":"","text":""}]}`;
 
   try {
     const d = await callGemini(prompt);
-    const goodHTML = (d.good||[]).map(g => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #c0dd97;color:#3B6D11">◎ ${g}</div>`).join('');
-    const improveHTML = (d.improve||[]).length > 0
-      ? `<div style="margin-top:10px"><div style="font-size:11px;font-weight:700;color:#633806;margin-bottom:4px">もっと良くできる点</div>${(d.improve||[]).map(i => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid #f5dbb3;color:#854F0B">△ ${i}</div>`).join('')}</div>` : '';
+    window._ytOptions = d.options || [];
 
-    document.getElementById('ap-result').innerHTML = `
+    const optionsHTML = (d.options||[]).map((opt,i) => `
+      <div class="option-card" id="yt-opt-${i}" onclick="selectYtOption(${i})">
+        <div class="option-tag">パターン ${i+1}：${opt.label||''}</div>
+        <div style="font-size:12px;color:#555;margin-top:4px;line-height:1.5">${opt.feature||''}</div>
+      </div>`).join('');
+
+    const feedbackColor = d.feedback?.caution ? '#FAEEDA' : '#EAF3DE';
+    const feedbackTextColor = d.feedback?.caution ? '#633806' : '#27500A';
+
+    document.getElementById('yt-result').innerHTML = `
       <div class="result-wrap">
         <div class="result-top">
-          <div class="result-title">承認申請文</div>
-          <button class="copy-btn" id="ap-copy" onclick="copyText('ap-approval-text','ap-copy')">コピー</button>
+          <div class="result-title">相手が読んで迷わない文章</div>
+          <button class="copy-btn" id="yt-best-copy" onclick="copyText('yt-best-text','yt-best-copy')">コピー</button>
         </div>
         <div class="result-body">
-          <textarea class="editable-result" id="ap-approval-text" rows="5">${d.approval||''}</textarea>
+          <textarea class="editable-result" id="yt-best-text" rows="6">${d.best||''}</textarea>
         </div>
       </div>
+
       <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">フィードバック</div></div>
+        <div class="result-top"><div class="result-title">相手目線のフィードバック</div></div>
         <div class="result-body">
-          ${goodHTML ? `<div style="margin-bottom:6px"><div style="font-size:11px;font-weight:700;color:#27500A;margin-bottom:4px">自分で考えられている点</div>${goodHTML}</div>` : ''}
-          ${improveHTML}
+          <div style="background:${feedbackColor};border-radius:8px;padding:12px;margin-bottom:${d.feedback?.caution ? '10px' : '0'}">
+            <div style="font-size:11px;font-weight:700;color:${feedbackTextColor};margin-bottom:4px">相手の印象</div>
+            <div style="font-size:13px;color:${feedbackTextColor};line-height:1.6">${d.feedback?.impression||''}</div>
+          </div>
+          ${d.feedback?.caution ? `
+          <div style="background:#FAEEDA;border-radius:8px;padding:12px;margin-top:8px">
+            <div style="font-size:11px;font-weight:700;color:#633806;margin-bottom:4px">負担になる可能性がある点</div>
+            <div style="font-size:13px;color:#854F0B;line-height:1.6">${d.feedback.caution}</div>
+          </div>` : ''}
+          ${d.feedback?.positive ? `
+          <div style="background:#EAF3DE;border-radius:8px;padding:12px;margin-top:8px">
+            <div style="font-size:11px;font-weight:700;color:#27500A;margin-bottom:4px">良い点</div>
+            <div style="font-size:13px;color:#3B6D11;line-height:1.6">${d.feedback.positive}</div>
+          </div>` : ''}
+        </div>
+      </div>
+
+      <div class="result-wrap" style="margin-top:10px">
+        <div class="result-top"><div class="result-title">送り方のバリエーション（タップして選ぶ）</div></div>
+        <div class="result-body">
+          <div style="display:grid;gap:8px;margin-bottom:1rem">${optionsHTML}</div>
+          <div id="yt-reply-area" style="display:none">
+            <hr style="border:none;border-top:1px solid #E8ECF0;margin:1rem 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-size:12px;font-weight:700">選択した文章（編集してそのまま送れます）</div>
+              <button class="copy-btn" id="yt-reply-copy" onclick="copyText('yt-reply-text','yt-reply-copy')">コピー</button>
+            </div>
+            <textarea class="editable-result" id="yt-reply-text" rows="6"></textarea>
+          </div>
         </div>
       </div>`;
-    document.getElementById('ap-result').style.display = 'block';
-    document.getElementById('ap-result').scrollIntoView({behavior:'smooth', block:'start'});
+
+    document.getElementById('yt-result').style.display = 'block';
+    document.getElementById('yt-result').scrollIntoView({behavior:'smooth', block:'start'});
   } catch(e) { alert('エラーが発生しました。\n' + e.message); }
-  setBtnLoading('ap-btn', false, '承認申請文を生成する');
+  setBtnLoading('yt-btn', false, '相手目線で文章を生成する');
 }
 
-// ===== スタッフ → 上長 =====
-async function runStaff() {
-  const situation = v('s-situation'), action = v('s-action');
-  if (!situation) { alert('何が起きたかを入力してください'); return; }
-  if (!action) { alert('自分の動きを入力してください'); return; }
-  setBtnLoading('s-btn', true, '報告文を生成する', false, ['報告内容を読み込み中...', '最適な報告文を考え中...', '選択肢を生成中...']);
-  const prompt = `あなたはWeb制作会社のベテランマネージャーです。スタッフが上長に報告する場面をサポートしてください。
-
-【状況・受け取った連絡】${situation}
-【自分の動き・考え】${action}
-【上長への相談・確認事項】${v('s-question') || 'なし'}
-【報告者】${v('s-name') || 'スタッフ'}
-【報告先】${v('s-to') || '上長'}
-
-以下を生成してください：
-1. この状況でのベストな報告文の例（です・ます調・200字程度・自分の判断と動きが明確に入っているもの）
-2. 自分がこれからどう動くかの選択肢を3つ（それぞれ異なるアプローチで。選んだらそのまま上長に送れる報告文になること）
-
-JSON形式のみで返答（他の文字は一切不要）:
-{"best_report":"ベストな報告文の例","options":[{"label":"選択肢のラベル（10字以内）","description":"このアプローチの特徴（1文）","report":"この選択肢を選んだ場合の報告文（です・ます調・そのまま送れる形）"},{"label":"","description":"","report":""},{"label":"","description":"","report":""}]}`;
-  try {
-    const d = await callGemini(prompt);
-    window._staffOptions = d.options || [];
-    const optionsHTML = (d.options||[]).map((opt,i) => `
-      <div class="option-card" id="s-opt-${i}" onclick="selectStaffOption(${i})">
-        <div class="option-tag">選択肢 ${i+1}：${opt.label||''}</div>
-        <div style="font-size:12px;color:#555;margin-top:4px">${opt.description||''}</div>
-      </div>`).join('');
-    document.getElementById('s-result').innerHTML = `
-      <div class="result-wrap">
-        <div class="result-top"><div class="result-title">ベストな報告文の例</div>
-        <button class="copy-btn" id="s-best-copy" onclick="copyText('s-best-text','s-best-copy')">コピー</button></div>
-        <div class="result-body">
-          <div style="font-size:11px;color:#666;margin-bottom:6px">こういう報告文が理想的です。参考にしてください。</div>
-          <textarea class="editable-result" id="s-best-text">${d.best_report||''}</textarea>
-        </div>
-      </div>
-      <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">自分の動き方の選択肢（タップして選ぶ）</div></div>
-        <div class="result-body">
-          <div style="display:grid;gap:6px;margin-bottom:1rem">${optionsHTML}</div>
-          <div id="s-reply-area" style="display:none">
-            <hr style="border:none;border-top:1px solid #eee;margin:1rem 0">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <div style="font-size:12px;font-weight:700">報告文（編集してそのまま送れます）</div>
-              <button class="copy-btn" id="s-reply-copy" onclick="copyText('s-reply-text','s-reply-copy')">コピー</button>
-            </div>
-            <textarea class="editable-result" id="s-reply-text" rows="6"></textarea>
-          </div>
-        </div>
-      </div>`;
-    document.getElementById('s-result').style.display='block';
-    document.getElementById('s-result').scrollIntoView({behavior:'smooth',block:'start'});
-  } catch(e) { alert('エラーが発生しました。\n'+e.message); }
-  setBtnLoading('s-btn', false, '報告文を生成する');
-}
-
-function selectStaffOption(idx) {
-  document.querySelectorAll('[id^="s-opt-"]').forEach((el,i) => el.classList.toggle('selected', i===idx));
-  const opt = window._staffOptions?.[idx];
+function selectYtOption(idx) {
+  document.querySelectorAll('[id^="yt-opt-"]').forEach((el,i) => el.classList.toggle('selected', i===idx));
+  const opt = window._ytOptions?.[idx];
   if (opt) {
-    document.getElementById('s-reply-text').value = opt.report || '';
-    document.getElementById('s-reply-area').style.display = 'block';
-    document.getElementById('s-reply-area').scrollIntoView({behavior:'smooth',block:'nearest'});
-  }
-}
-
-// ===== 上長 → 社長 =====
-async function runManager() {
-  const situation = v('m-situation');
-  if (!situation) { alert('報告内容を入力してください'); return; }
-  setBtnLoading('m-btn', true, '社長への報告文を生成する', false, ['報告内容を整理中...', '社長視点で分析中...', '報告文を生成中...']);
-  const prompt = `あなたは経営者の右腕として社長への報告をサポートします。
-
-【報告内容】${situation}
-【見立て・対策】${v('m-action')||'なし'}
-【社長への相談】${v('m-question')||'なし'}
-【報告者】${v('m-name')||'上長'}　【種類】${v('m-type')||'報告'}
-
-以下を生成してください：
-1. 社長への理想的な報告文の例（簡潔・的確・200〜300字・自分の判断と提案が入っているもの）
-2. 報告の切り口・アプローチを3つ（状況に応じて選べる異なるスタンスで）
-
-JSON形式のみで返答（他の文字は一切不要）:
-{"best_report":"ベストな報告文の例","options":[{"label":"切り口のラベル（10字以内）","description":"このアプローチの特徴（1文）","report":"この切り口での報告文（です・ます調・そのまま送れる形・200〜300字）"},{"label":"","description":"","report":""},{"label":"","description":"","report":""}]}`;
-  try {
-    const d = await callGemini(prompt);
-    window._managerOptions = d.options || [];
-    const optionsHTML = (d.options||[]).map((opt,i) => `
-      <div class="option-card" id="m-opt-${i}" onclick="selectManagerOption(${i})">
-        <div class="option-tag">切り口 ${i+1}：${opt.label||''}</div>
-        <div style="font-size:12px;color:#555;margin-top:4px">${opt.description||''}</div>
-      </div>`).join('');
-    document.getElementById('m-result').innerHTML = `
-      <div class="result-wrap">
-        <div class="result-top"><div class="result-title">ベストな報告文の例</div>
-        <button class="copy-btn" id="m-best-copy" onclick="copyText('m-best-text','m-best-copy')">コピー</button></div>
-        <div class="result-body">
-          <div style="font-size:11px;color:#666;margin-bottom:6px">社長が求めているレベルの報告文です。参考にしてください。</div>
-          <textarea class="editable-result" id="m-best-text">${d.best_report||''}</textarea>
-        </div>
-      </div>
-      <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">報告の切り口（タップして選ぶ）</div></div>
-        <div class="result-body">
-          <div style="display:grid;gap:6px;margin-bottom:1rem">${optionsHTML}</div>
-          <div id="m-reply-area" style="display:none">
-            <hr style="border:none;border-top:1px solid #eee;margin:1rem 0">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <div style="font-size:12px;font-weight:700">報告文（編集してそのまま送れます）</div>
-              <button class="copy-btn" id="m-reply-copy" onclick="copyText('m-reply-text','m-reply-copy')">コピー</button>
-            </div>
-            <textarea class="editable-result" id="m-reply-text" rows="6"></textarea>
-          </div>
-        </div>
-      </div>`;
-    document.getElementById('m-result').style.display='block';
-    document.getElementById('m-result').scrollIntoView({behavior:'smooth',block:'start'});
-  } catch(e) { alert('エラーが発生しました。\n'+e.message); }
-  setBtnLoading('m-btn', false, '社長への報告文を生成する');
-}
-
-function selectManagerOption(idx) {
-  document.querySelectorAll('[id^="m-opt-"]').forEach((el,i) => el.classList.toggle('selected', i===idx));
-  const opt = window._managerOptions?.[idx];
-  if (opt) {
-    document.getElementById('m-reply-text').value = opt.report || '';
-    document.getElementById('m-reply-area').style.display = 'block';
-    document.getElementById('m-reply-area').scrollIntoView({behavior:'smooth',block:'nearest'});
-  }
-}
-
-// ===== 担当 ↔ クライアント =====
-async function runClient() {
-  const input = v('c-input');
-  if (!input) { alert('連絡文を入力してください'); return; }
-  setBtnLoading('c-btn', true, '内容を分析して返し方を提案する', false, ['連絡内容を読み込み中...', 'クライアントの意図を分析中...', '返し方を考え中...']);
-  const prompt = `あなたはWeb制作会社のベテランディレクターです。クライアントからの連絡を分析し返し方を3つ提案してください。
-
-【連絡文】${input}
-【クライアント・案件】${v('c-client')||'不明'}
-【背景】${v('c-context')||'不明'}
-
-JSON形式のみで返答:
-{"summary":"要点2〜3文","intent":"真の意図・感情1文","caution":"注意点1文","options":[{"label":"選択肢ラベル","merit":"メリット","demerit":"リスク","reply":"返信文です・ます調"},{},{}]}`;
-  try {
-    const d = await callGemini(prompt);
-    const optionsHTML = (d.options||[]).map((opt,i)=>`
-      <div class="option-card" id="opt-${i}" onclick="selectOption(${i})">
-        <div class="option-tag">選択肢 ${i+1}：${opt.label||''}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px">
-          <div style="font-size:11px;color:#27500A">◎ ${opt.merit||''}</div>
-          <div style="font-size:11px;color:#A32D2D">▲ ${opt.demerit||''}</div>
-        </div>
-      </div>`).join('');
-    window._clientOptions = d.options||[];
-    document.getElementById('c-result').innerHTML = `
-      <div class="result-wrap"><div class="result-top"><div class="result-title">連絡内容の分析</div></div>
-      <div class="result-body">
-        <div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#444;margin-bottom:4px">要点</div>
-        <div style="font-size:12px;line-height:1.7">${d.summary||''}</div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:#E6F1FB;border-radius:6px;padding:8px 10px">
-            <div style="font-size:10px;font-weight:700;color:#0C447C;margin-bottom:3px">真の意図・感情</div>
-            <div style="font-size:12px;color:#185FA5">${d.intent||''}</div>
-          </div>
-          <div style="background:#FAEEDA;border-radius:6px;padding:8px 10px">
-            <div style="font-size:10px;font-weight:700;color:#633806;margin-bottom:3px">対応時の注意点</div>
-            <div style="font-size:12px;color:#854F0B">${d.caution||''}</div>
-          </div>
-        </div>
-      </div></div>
-      <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">返し方の選択肢（タップして選ぶ）</div></div>
-        <div class="result-body">
-          <div style="display:grid;gap:6px;margin-bottom:1rem">${optionsHTML}</div>
-          <div id="reply-area" style="display:none">
-            <hr style="border:none;border-top:1px solid #eee;margin:1rem 0">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <div style="font-size:12px;font-weight:700">返信文（編集してそのまま送れます）</div>
-              <button class="copy-btn" id="c-copy" onclick="copyText('c-reply-text','c-copy')">コピー</button>
-            </div>
-            <textarea class="editable-result" id="c-reply-text" rows="6"></textarea>
-          </div>
-        </div>
-      </div>`;
-    document.getElementById('c-result').style.display='block';
-    document.getElementById('c-result').scrollIntoView({behavior:'smooth',block:'start'});
-  } catch(e) { alert('エラーが発生しました。\n'+e.message); }
-  setBtnLoading('c-btn', false, '内容を分析して返し方を提案する');
-}
-
-function selectOption(idx) {
-  document.querySelectorAll('.option-card').forEach((el,i)=>el.classList.toggle('selected',i===idx));
-  const opt = window._clientOptions?.[idx];
-  if(opt){
-    document.getElementById('c-reply-text').value=opt.reply||'';
-    document.getElementById('reply-area').style.display='block';
-    document.getElementById('reply-area').scrollIntoView({behavior:'smooth',block:'nearest'});
+    document.getElementById('yt-reply-text').value = opt.text || '';
+    document.getElementById('yt-reply-area').style.display = 'block';
+    document.getElementById('yt-reply-area').scrollIntoView({behavior:'smooth', block:'nearest'});
   }
 }
 
@@ -1104,6 +897,8 @@ function copyResult() {
 
 addProject();
 
+
+addProject();
 </script>
 </body>
 </html>
