@@ -7,80 +7,77 @@
   <style>
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; font-size: 13px; }
-    .container { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
-    .header { margin-bottom: 1.5rem; }
-    .header h1 { font-size: 20px; font-weight: 700; }
-    .header p { font-size: 12px; color: #888; margin-top: 3px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif; background: #F2F4F7; color: #1a1a1a; min-height: 100vh; font-size: 13px; }
 
-    .tab-bar { display: flex; border-bottom: 2px solid #e0e0e0; margin-bottom: 1.5rem; gap: 4px; }
-    .tab { padding: 10px 20px; font-size: 13px; cursor: pointer; border: none; background: none; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; font-weight: 600; font-family: inherit; border-radius: 8px 8px 0 0; }
-    .tab:hover { background: #f0f0ee; color: #555; }
-    .tab.active { color: #1a1a1a; border-bottom-color: #378ADD; background: #fff; }
+    /* ヘッダー */
+    .site-header { background: #1a2533; padding: 0; margin-bottom: 0; }
+    .site-header-inner { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .site-logo { display: flex; align-items: center; gap: 10px; }
+    .site-logo-mark { width: 28px; height: 28px; background: #378ADD; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .site-logo-mark svg { width: 16px; height: 16px; fill: #fff; }
+    .site-logo-name { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.03em; }
+    .site-logo-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-left: 4px; font-weight: 400; }
+
+    /* メインコンテナ */
+    .container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; }
+
+    /* タブ */
+    .tab-bar { display: flex; gap: 2px; margin-bottom: 1.5rem; background: #fff; border-radius: 10px; padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .tab { flex: 1; padding: 9px 8px; font-size: 12px; cursor: pointer; border: none; background: none; color: #888; font-weight: 600; font-family: inherit; border-radius: 7px; transition: all 0.15s; text-align: center; }
+    .tab:hover { background: #F2F4F7; color: #555; }
+    .tab.active { background: #378ADD; color: #fff; }
     .section { display: none; }
     .section.active { display: block; }
 
-    .card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1rem; margin-bottom: 10px; }
-    label { font-size: 11px; color: #777; display: block; margin-bottom: 3px; }
-    input[type=text], select, textarea { width: 100%; font-size: 12px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #1a1a1a; font-family: inherit; }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: #378ADD; }
-    textarea { resize: vertical; line-height: 1.6; }
-    .field { margin-bottom: 10px; }
-    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    /* カード */
+    .card { background: #fff; border: 1px solid #E8ECF0; border-radius: 12px; padding: 1.25rem; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .card.highlight { border: 2px solid #378ADD; background: #FAFCFF; }
+
+    label { font-size: 11px; color: #666; display: block; margin-bottom: 4px; font-weight: 500; }
+    input[type=text], select, textarea { width: 100%; font-size: 13px; padding: 8px 10px; border: 1px solid #DDE1E7; border-radius: 8px; background: #fff; color: #1a1a1a; font-family: inherit; transition: border-color 0.15s; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.1); }
+    textarea { resize: vertical; line-height: 1.7; }
+    .field { margin-bottom: 12px; }
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .req { color: #E24B4A; }
 
+    /* ボタン */
     button { font-family: inherit; cursor: pointer; }
-    button.primary { background: #378ADD; color: #fff; border: none; padding: 11px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; width: 100%; }
-    button.primary:hover { background: #185FA5; }
-    button.primary:disabled { background: #B5D4F4; cursor: not-allowed; }
-    button.copy-btn { background: #fff; border: 1px solid #ddd; padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #1a1a1a; }
-    button.copy-btn:hover { background: #f5f5f5; }
+    button.primary { background: #378ADD; color: #fff; border: none; padding: 13px 24px; border-radius: 10px; font-size: 14px; font-weight: 700; width: 100%; letter-spacing: 0.02em; transition: background 0.15s, transform 0.1s; }
+    button.primary:hover { background: #185FA5; transform: translateY(-1px); }
+    button.primary:active { transform: translateY(0); }
+    button.primary:disabled { background: #B5D4F4; cursor: not-allowed; transform: none; }
+    button.copy-btn { background: #fff; border: 1px solid #DDE1E7; padding: 6px 16px; border-radius: 7px; font-size: 12px; font-weight: 600; color: #444; transition: all 0.15s; }
+    button.copy-btn:hover { background: #F2F4F7; border-color: #bbb; }
     button.copy-btn.copied { background: #EAF3DE; border-color: #97C459; color: #27500A; }
-    button.option-btn { background: #fff; border: 1px solid #ddd; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: #1a1a1a; text-align: left; width: 100%; margin-bottom: 6px; }
-    button.option-btn:hover { background: #f0f6ff; border-color: #378ADD; }
-    button.option-btn.selected { background: #E6F1FB; border-color: #378ADD; color: #0C447C; font-weight: 600; }
 
-    .result-wrap { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; overflow: hidden; margin-top: 1rem; }
-    .result-top { background: #f8f8f6; padding: 0.75rem 1rem; border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
-    .result-title { font-size: 13px; font-weight: 700; }
-    .result-body { padding: 1rem; }
-    .result-text { background: #f5f5f3; border-radius: 6px; padding: 1rem; font-size: 12px; line-height: 1.9; white-space: pre-wrap; color: #1a1a1a; font-family: inherit; }
-    .editable-result { width: 100%; font-size: 12px; line-height: 1.9; padding: 1rem; background: #f5f5f3; border: none; border-radius: 6px; color: #1a1a1a; font-family: inherit; resize: vertical; min-height: 140px; }
-    .editable-result:focus { outline: 1px solid #378ADD; }
+    /* 結果エリア */
+    .result-wrap { background: #fff; border: 1px solid #E8ECF0; border-radius: 12px; overflow: hidden; margin-top: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .result-top { background: #F8F9FB; padding: 0.85rem 1.25rem; border-bottom: 1px solid #E8ECF0; display: flex; justify-content: space-between; align-items: center; }
+    .result-title { font-size: 13px; font-weight: 700; color: #333; }
+    .result-body { padding: 1.25rem; }
+    .editable-result { width: 100%; font-size: 13px; line-height: 1.9; padding: 1rem; background: #F8F9FB; border: 1px solid #E8ECF0; border-radius: 8px; color: #1a1a1a; font-family: inherit; resize: vertical; min-height: 140px; }
+    .editable-result:focus { outline: none; border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.1); }
 
-    .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: sp 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    /* オプションカード */
+    .option-card { background: #fff; border: 1.5px solid #E8ECF0; border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: all 0.15s; margin-bottom: 8px; }
+    .option-card:hover { border-color: #378ADD; background: #F5F9FF; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(55,138,221,0.1); }
+    .option-card.selected { border-color: #378ADD; background: #EBF4FF; box-shadow: 0 0 0 3px rgba(55,138,221,0.1); }
+    .option-tag { font-size: 11px; font-weight: 700; color: #378ADD; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* スピナー */
+    .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: sp 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes sp { to { transform: rotate(360deg); } }
 
-    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
-    .analysis-card { border-radius: 8px; padding: 10px 12px; }
-    .analysis-card.info { background: #E6F1FB; }
-    .analysis-card.warn { background: #FAEEDA; }
-    .analysis-card.ok { background: #EAF3DE; }
-    .analysis-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4px; color: #444; }
-    .analysis-card.info .analysis-card-label { color: #0C447C; }
-    .analysis-card.warn .analysis-card-label { color: #633806; }
-    .analysis-card.ok .analysis-card-label { color: #27500A; }
-    .analysis-card-val { font-size: 12px; line-height: 1.5; color: #1a1a1a; }
-
-    .option-section { margin-top: 1rem; }
-    .option-label { font-size: 12px; font-weight: 700; color: #444; margin-bottom: 8px; }
-    .option-list { display: grid; gap: 6px; }
-    .option-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.1s; }
-    .option-card:hover { border-color: #378ADD; background: #f0f6ff; }
-    .option-card.selected { border-color: #378ADD; background: #E6F1FB; }
-    .option-tag { font-size: 10px; font-weight: 700; color: #378ADD; margin-bottom: 4px; }
-    .option-text { font-size: 12px; line-height: 1.6; color: #1a1a1a; }
-
+    /* バッジ */
     .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-    .badge-info { background: #E6F1FB; color: #0C447C; }
     .badge-ok { background: #EAF3DE; color: #27500A; }
     .badge-warn { background: #FAEEDA; color: #633806; }
 
-    .divider { border: none; border-top: 1px solid #eee; margin: 1rem 0; }
-
     @media (max-width: 640px) {
-      .g2, .analysis-grid { grid-template-columns: 1fr; }
-      .tab { padding: 10px 12px; font-size: 12px; }
+      .g2 { grid-template-columns: 1fr; }
+      .tab { font-size: 11px; padding: 8px 4px; }
+      .site-logo-sub { display: none; }
     }
   
 
@@ -125,11 +122,18 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h1>自立補助ツール</h1>
-    <p>報告・やりとりをサポートするツールです</p>
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="site-logo">
+      <div class="site-logo-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <span class="site-logo-name">自立補助ツール</span>
+      <span class="site-logo-sub">South Agency</span>
+    </div>
   </div>
+</header>
+<div class="container">
 
   <div class="tab-bar">
     <button class="tab active" onclick="switchTab('approval')">承認申請</button>
@@ -153,7 +157,7 @@
       </div>
     </div>
 
-    <div class="card" style="border:1.5px solid #378ADD">
+    <div class="card highlight">
       <div style="font-size:12px;font-weight:700;color:#0C447C;margin-bottom:10px">ここが一番大事です。自分で考えてから入力してください。</div>
       <div class="field">
         <label>この状況で、自分はどう動こうと思っているか <span class="req">*</span>（空欄だと申請文を作れません）</label>
@@ -352,14 +356,23 @@ async function callGemini(prompt) {
   return d.result;
 }
 
-function setBtnLoading(id, loading, defaultLabel, retrying = false) {
+function setBtnLoading(id, loading, defaultLabel, retrying = false, messages = []) {
   const btn = document.getElementById(id);
   if (!btn) return;
   btn.disabled = loading;
   if (!loading) {
     btn.innerHTML = defaultLabel;
+    if (btn._msgInterval) { clearInterval(btn._msgInterval); delete btn._msgInterval; }
   } else if (retrying) {
     btn.innerHTML = '<span class="spin"></span>制限中のため再試行中...';
+  } else if (messages.length > 0) {
+    let i = 0;
+    btn.innerHTML = '<span class="spin"></span>' + messages[0];
+    btn._msgInterval = setInterval(() => {
+      i = (i + 1) % messages.length;
+      if (btn.disabled) btn.innerHTML = '<span class="spin"></span>' + messages[i];
+      else clearInterval(btn._msgInterval);
+    }, 1800);
   } else {
     btn.innerHTML = '<span class="spin"></span>AI分析中...';
   }
@@ -394,7 +407,7 @@ async function runApproval() {
     return;
   }
 
-  setBtnLoading('ap-btn', true, '承認申請文を生成する');
+  setBtnLoading('ap-btn', true, '承認申請文を生成する', false, ['状況を分析中...', '自立度をチェック中...', '申請文を作成中...']);
 
   const prompt = `あなたはWeb制作会社のベテランマネージャーです。スタッフが上長に承認申請をする場面をサポートしてください。
 
@@ -447,7 +460,7 @@ async function runStaff() {
   const situation = v('s-situation'), action = v('s-action');
   if (!situation) { alert('何が起きたかを入力してください'); return; }
   if (!action) { alert('自分の動きを入力してください'); return; }
-  setBtnLoading('s-btn', true, '報告文を生成する');
+  setBtnLoading('s-btn', true, '報告文を生成する', false, ['報告内容を読み込み中...', '最適な報告文を考え中...', '選択肢を生成中...']);
   const prompt = `あなたはWeb制作会社のベテランマネージャーです。スタッフが上長に報告する場面をサポートしてください。
 
 【状況・受け取った連絡】${situation}
@@ -513,7 +526,7 @@ function selectStaffOption(idx) {
 async function runManager() {
   const situation = v('m-situation');
   if (!situation) { alert('報告内容を入力してください'); return; }
-  setBtnLoading('m-btn', true, '社長への報告文を生成する');
+  setBtnLoading('m-btn', true, '社長への報告文を生成する', false, ['報告内容を整理中...', '社長視点で分析中...', '報告文を生成中...']);
   const prompt = `あなたは経営者の右腕として社長への報告をサポートします。
 
 【報告内容】${situation}
@@ -578,7 +591,7 @@ function selectManagerOption(idx) {
 async function runClient() {
   const input = v('c-input');
   if (!input) { alert('連絡文を入力してください'); return; }
-  setBtnLoading('c-btn', true, '内容を分析して返し方を提案する');
+  setBtnLoading('c-btn', true, '内容を分析して返し方を提案する', false, ['連絡内容を読み込み中...', 'クライアントの意図を分析中...', '返し方を考え中...']);
   const prompt = `あなたはWeb制作会社のベテランディレクターです。クライアントからの連絡を分析し返し方を3つ提案してください。
 
 【連絡文】${input}
