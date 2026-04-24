@@ -536,13 +536,17 @@ async function runYaritori(isRegenerate = false, inheritPrev = false) {
         <input type="file" id="yt-regen-image-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" multiple onchange="handleImageSelect(event,'regen')">
       </div>
       <div style="font-size:12px;font-weight:600;color:#444;margin-bottom:8px">前回の生成結果を引き継ぐ？</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button onclick="doRegenerate(true)" style="background:#378ADD;color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+      <div id="regen-btn-area" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button id="regen-btn-inherit" onclick="doRegenerate(true)" style="background:#378ADD;color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
           ✓ 引き継いで再生成
         </button>
-        <button onclick="doRegenerate(false)" style="background:#fff;color:#378ADD;border:1.5px solid #378ADD;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+        <button id="regen-btn-fresh" onclick="doRegenerate(false)" style="background:#fff;color:#378ADD;border:1.5px solid #378ADD;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
           ✗ ゼロから再生成
         </button>
+      </div>
+      <div id="regen-loading" style="display:none;margin-top:10px;background:#E6F1FB;border-radius:8px;padding:12px;text-align:center">
+        <span style="display:inline-block;width:14px;height:14px;border:2px solid #378ADD;border-top-color:transparent;border-radius:50%;animation:sp 0.7s linear infinite;vertical-align:middle;margin-right:8px"></span>
+        <span id="regen-loading-msg" style="font-size:13px;color:#0C447C;font-weight:600">生成中...</span>
       </div>`;
     _images.regen = [];
 
@@ -559,6 +563,27 @@ async function runYaritori(isRegenerate = false, inheritPrev = false) {
 }
 
 function doRegenerate(inherit) {
+  // ボタンをその場でローディング表示に切り替え（二度押し防止）
+  const btnInherit = document.getElementById('regen-btn-inherit');
+  const btnFresh = document.getElementById('regen-btn-fresh');
+  const loadingEl = document.getElementById('regen-loading');
+  const loadingMsg = document.getElementById('regen-loading-msg');
+  const btnArea = document.getElementById('regen-btn-area');
+
+  if (btnInherit) { btnInherit.disabled = true; btnInherit.style.opacity = '0.5'; btnInherit.style.cursor = 'not-allowed'; }
+  if (btnFresh) { btnFresh.disabled = true; btnFresh.style.opacity = '0.5'; btnFresh.style.cursor = 'not-allowed'; }
+  if (btnArea) btnArea.style.display = 'none';
+  if (loadingEl) loadingEl.style.display = 'block';
+
+  // ローテーションメッセージ
+  const msgs = ['状況を整理中...', '相手の立場で考え中...', '文章を生成中...'];
+  let mi = 0;
+  const msgInterval = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    if (loadingMsg) loadingMsg.textContent = msgs[mi];
+  }, 1800);
+  window._regenMsgInterval = msgInterval;
+
   // 追加情報をメッセージに追記
   const addInfo = document.getElementById('yt-add-info')?.value?.trim();
   if (addInfo) {
@@ -568,10 +593,14 @@ function doRegenerate(inherit) {
       msgEl.value = current + (current ? '\n\n【追加情報】' + addInfo : addInfo);
     }
   }
-  // 再生成ボタンのラベルを変更
-  const btn = document.getElementById('yt-btn');
-  if (btn) btn.textContent = '再生成する';
-  runYaritori(true, inherit);
+
+  runYaritori(true, inherit).finally(() => {
+    clearInterval(window._regenMsgInterval);
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (btnArea) btnArea.style.display = 'grid';
+    if (btnInherit) { btnInherit.disabled = false; btnInherit.style.opacity = '1'; btnInherit.style.cursor = 'pointer'; }
+    if (btnFresh) { btnFresh.disabled = false; btnFresh.style.opacity = '1'; btnFresh.style.cursor = 'pointer'; }
+  });
 }
 
 function selectYtOption(idx) {
