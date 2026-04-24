@@ -3,12 +3,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { prompt } = req.body;
+  const { prompt, imageBase64 } = req.body;
   if (!prompt) {
     return res.status(400).json({ error: 'prompt is required' });
   }
 
   try {
+    let content;
+    if (imageBase64) {
+      const match = imageBase64.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+      if (match) {
+        const mediaType = match[1];
+        const data = match[2];
+        content = [
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data } },
+          { type: 'text', text: prompt }
+        ];
+      } else {
+        content = prompt;
+      }
+    } else {
+      content = prompt;
+    }
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -19,7 +36,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 2000,
-        messages: [{ role: 'user', content: prompt }]
+        messages: [{ role: 'user', content }]
       })
     });
 

@@ -188,6 +188,15 @@
         <label>相手に何をしてほしいか（判断・承認・情報提供など）</label>
         <input type="text" id="yt-action" placeholder="例）○○について判断・承認をいただきたいです">
       </div>
+      <div class="field" style="margin-bottom:0;margin-top:12px">
+        <label>画面・資料などの画像（任意）</label>
+        <div id="yt-image-wrap" style="border:2px dashed #DDE1E7;border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all 0.15s" onclick="document.getElementById('yt-image-input').click()" ondragover="event.preventDefault();this.style.borderColor='#378ADD'" ondragleave="this.style.borderColor='#DDE1E7'" ondrop="handleImageDrop(event)">
+          <div id="yt-image-placeholder" style="font-size:12px;color:#aaa">クリックまたはドラッグ&ドロップで画像をアップロード（PNG・JPG）</div>
+          <img id="yt-image-preview" style="display:none;max-width:100%;max-height:200px;border-radius:6px;margin-top:8px">
+          <button id="yt-image-clear" onclick="clearImage(event)" style="display:none;margin-top:8px;background:none;border:1px solid #ddd;padding:4px 12px;border-radius:6px;font-size:11px;color:#888;cursor:pointer">画像を削除</button>
+        </div>
+        <input type="file" id="yt-image-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="handleImageSelect(event)">
+      </div>
     </div>
 
     <div class="card">
@@ -299,15 +308,53 @@ function fmtDate(val) {
   return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
 }
 
-async function callGemini(prompt) {
+async function callGemini(prompt, imageBase64 = null) {
+  const body = imageBase64 ? { prompt, imageBase64 } : { prompt };
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error('API error: ' + res.status);
   const d = await res.json();
   return d.result;
+}
+
+// 画像関連
+let _imageBase64 = null;
+
+function handleImageSelect(e) {
+  const file = e.target.files[0];
+  if (file) loadImage(file);
+}
+
+function handleImageDrop(e) {
+  e.preventDefault();
+  document.getElementById('yt-image-wrap').style.borderColor = '#DDE1E7';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+}
+
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _imageBase64 = e.target.result;
+    const preview = document.getElementById('yt-image-preview');
+    preview.src = _imageBase64;
+    preview.style.display = 'block';
+    document.getElementById('yt-image-placeholder').style.display = 'none';
+    document.getElementById('yt-image-clear').style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage(e) {
+  e.stopPropagation();
+  _imageBase64 = null;
+  document.getElementById('yt-image-preview').style.display = 'none';
+  document.getElementById('yt-image-placeholder').style.display = 'block';
+  document.getElementById('yt-image-clear').style.display = 'none';
+  document.getElementById('yt-image-input').value = '';
 }
 
 function setBtnLoading(id, loading, defaultLabel, retrying = false, messages = []) {
@@ -345,7 +392,10 @@ function copyText(id, btnId) {
 }
 
 // ===== やり取りサポート =====
-async function runYaritori() {
+// 前回の生成結果を保存
+let _lastResult = null;
+
+async function runYaritori(isRegenerate = false, inheritPrev = false) {
   const situation = v('yt-situation');
   const message = v('yt-message');
   if (!situation) { alert('状況・背景を入力してください'); return; }
@@ -354,9 +404,17 @@ async function runYaritori() {
   const cfg = modeConfig[currentMode];
   const modeLabels = { manager: '上長・社長への報告・相談', client: 'クライアントへの返信・提案', member: '社内メンバーへの依頼・共有' };
 
-  setBtnLoading('yt-btn', true, '相手目線で文章を生成する', false, [
+  const btnLabel = isRegenerate ? '再生成する' : '相手目線で文章を生成する';
+  setBtnLoading('yt-btn', true, btnLabel, false, [
     '状況を整理中...', '相手の立場で考え中...', '読みやすい文章を生成中...'
   ]);
+
+  // 画像のbase64（data:image/...;base64,... 形式）
+  const imageBase64 = _imageBase64 || null;
+  const imageNote = imageBase64 ? '\n【添付画像】画像が添付されています。画面の状態・エラー内容・資料の内容を読み取り、状況の理解と文章生成に活用してください。' : '';
+
+  // 前回結果を加味する場合の追加情報
+  const prevNote = (isRegenerate && inheritPrev && _lastResult) ? `\n【前回の生成結果（参考）】\n前回のベスト文章：${_lastResult.best}\n前回のフィードバック：${_lastResult.feedback?.impression || ''}\n今回は追加情報を加味してさらに改善してください。` : '';
 
   const prompt = `あなたは${cfg.aiRole}です。${cfg.aiContext}
 
@@ -365,7 +423,7 @@ async function runYaritori() {
 【状況・背景】${situation}
 【伝えたいこと】${message}
 【相手にしてほしいこと】${v('yt-action') || '未記入'}
-【場面】${modeLabels[currentMode]}
+【場面】${modeLabels[currentMode]}${imageNote}${prevNote}
 
 以下を生成してください：
 1. 相手が読んで迷わない・負担が少ない文章（です・ます調・簡潔・要点が明確）
@@ -376,7 +434,8 @@ async function runYaritori() {
 {"best":"ベストな文章","feedback":{"positive":"良い点（1文）","caution":"相手が負担に感じる可能性がある点（なければ空文字）","impression":"この文章を受け取った相手の印象（1文）"},"options":[{"label":"バリエーションのラベル（10字以内）","feature":"このアプローチの特徴（1文）","text":"このバリエーションの文章"},{"label":"","feature":"","text":""},{"label":"","feature":"","text":""}]}`;
 
   try {
-    const d = await callGemini(prompt);
+    const d = await callGemini(prompt, imageBase64);
+    _lastResult = d;
     window._ytOptions = d.options || [];
 
     const optionsHTML = (d.options||[]).map((opt,i) => `
@@ -434,10 +493,49 @@ async function runYaritori() {
         </div>
       </div>`;
 
+    // ③ 再生成ボタンを追加
+    const regenArea = document.createElement('div');
+    regenArea.id = 'yt-regen-area';
+    regenArea.style.cssText = 'margin-top:1rem;background:#fff;border:1px solid #E8ECF0;border-radius:12px;padding:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.04)';
+    regenArea.innerHTML = `
+      <div style="font-size:13px;font-weight:700;color:#333;margin-bottom:10px">情報を追加して再生成</div>
+      <textarea id="yt-add-info" rows="2" placeholder="例）先方から追加で〇〇という情報が来ました。これも加味してください。" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid #DDE1E7;border-radius:8px;background:#fff;font-family:inherit;resize:vertical;line-height:1.6;margin-bottom:10px"></textarea>
+      <div style="font-size:12px;font-weight:600;color:#444;margin-bottom:8px">前回の生成結果を引き継ぐ？</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="doRegenerate(true)" style="background:#378ADD;color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          ✓ 引き継いで再生成
+        </button>
+        <button onclick="doRegenerate(false)" style="background:#fff;color:#378ADD;border:1.5px solid #378ADD;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          ✗ ゼロから再生成
+        </button>
+      </div>`;
+
+    const resultEl = document.getElementById('yt-result');
+    // 既存の再生成エリアを削除してから追加
+    const existing = document.getElementById('yt-regen-area');
+    if (existing) existing.remove();
+    resultEl.appendChild(regenArea);
+
     document.getElementById('yt-result').style.display = 'block';
     document.getElementById('yt-result').scrollIntoView({behavior:'smooth', block:'start'});
   } catch(e) { alert('エラーが発生しました。\n' + e.message); }
-  setBtnLoading('yt-btn', false, '相手目線で文章を生成する');
+  setBtnLoading('yt-btn', false, isRegenerate ? '再生成する' : '相手目線で文章を生成する');
+}
+
+function doRegenerate(inherit) {
+  // 追加情報をメッセージに追記
+  const addInfo = document.getElementById('yt-add-info')?.value?.trim();
+  if (addInfo) {
+    const msgEl = document.getElementById('yt-message');
+    if (msgEl) {
+      const current = msgEl.value.trim();
+      msgEl.value = current + (current ? '\n\n【追加情報】' + addInfo : addInfo);
+    }
+  }
+  // 再生成ボタンのラベルを変更
+  const btn = document.getElementById('yt-btn');
+  if (btn) btn.textContent = '再生成する';
+  runYaritori(true, inherit);
 }
 
 function selectYtOption(idx) {
