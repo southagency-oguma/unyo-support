@@ -514,6 +514,14 @@ async function runYaritori(isRegenerate = false, inheritPrev = false) {
               <button class="copy-btn" id="yt-reply-copy" onclick="copyText('yt-reply-text','yt-reply-copy')">コピー</button>
             </div>
             <textarea class="editable-result" id="yt-reply-text" rows="6"></textarea>
+
+            <div style="margin-top:1rem;padding:1rem;background:#F8F9FB;border:1px solid #E8ECF0;border-radius:10px">
+              <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:6px">自分で文章を直した場合、推敲・改善できます</div>
+              <div style="font-size:11px;color:#888;margin-bottom:8px">上の文章を自分なりに修正したら、下に貼り付けてください。どこが良くなったか・さらに改善できるかをフィードバックします。</div>
+              <textarea id="yt-polish-input" rows="4" placeholder="自分で直した文章をここに貼り付けてください..." style="width:100%;font-size:12px;padding:8px 10px;border:1px solid #DDE1E7;border-radius:8px;background:#fff;font-family:inherit;resize:vertical;line-height:1.6;margin-bottom:8px"></textarea>
+              <button id="yt-polish-btn" onclick="runPolish()" style="background:#1A2533;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">推敲・改善する</button>
+              <div id="yt-polish-result" style="display:none;margin-top:1rem"></div>
+            </div>
           </div>
         </div>
       </div>`;
@@ -609,8 +617,95 @@ function selectYtOption(idx) {
   if (opt) {
     document.getElementById('yt-reply-text').value = opt.text || '';
     document.getElementById('yt-reply-area').style.display = 'block';
+    // 推敲エリアをリセット
+    document.getElementById('yt-polish-input').value = '';
+    document.getElementById('yt-polish-result').style.display = 'none';
     document.getElementById('yt-reply-area').scrollIntoView({behavior:'smooth', block:'nearest'});
   }
+}
+
+async function runPolish() {
+  const original = document.getElementById('yt-reply-text')?.value?.trim();
+  const revised = document.getElementById('yt-polish-input')?.value?.trim();
+
+  if (!revised) { alert('直した文章を入力してください'); return; }
+
+  const btn = document.getElementById('yt-polish-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>推敲中...';
+
+  // ローテーションメッセージ
+  const msgs = ['文章を読み込み中...', '変更点を分析中...', '改善案を考え中...'];
+  let mi = 0;
+  const interval = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    if (btn.disabled) btn.innerHTML = '<span class="spin"></span>' + msgs[mi];
+    else clearInterval(interval);
+  }, 1500);
+
+  const situation = v('yt-situation') || '';
+  const message = v('yt-message') || '';
+
+  const prompt = `あなたは文章のプロフェッショナルです。以下の状況を踏まえて、AIが生成した文章を人が手直しした場合の推敲・改善をサポートしてください。
+
+【送信する状況・背景】
+${situation}
+
+【伝えたいこと】
+${message}
+
+【AIが生成した元の文章】
+${original || '（元文章なし）'}
+
+【自分で手直しした文章】
+${revised}
+
+以下を分析してください：
+1. 手直しによって良くなった点（具体的に）
+2. 惜しい点・さらに改善できる点（あれば）
+3. さらに磨いた最終改善版の文章
+
+JSON形式のみで返答（他の文字は一切不要）:
+{"good":["良くなった点（配列・最大3つ）"],"caution":["惜しい点（配列・なければ空配列）"],"improved":"さらに磨いた最終改善版の文章"}`;
+
+  try {
+    const d = await callGemini(prompt);
+
+    const goodHTML = (d.good||[]).map(g =>
+      `<div style="font-size:12px;padding:5px 0;border-bottom:1px solid #c0dd97;color:#3B6D11">◎ ${g}</div>`
+    ).join('');
+
+    const cautionHTML = (d.caution||[]).length > 0
+      ? `<div style="margin-top:10px">
+          <div style="font-size:11px;font-weight:700;color:#633806;margin-bottom:4px">惜しい点</div>
+          ${(d.caution||[]).map(c => `<div style="font-size:12px;padding:5px 0;border-bottom:1px solid #f5dbb3;color:#854F0B">△ ${c}</div>`).join('')}
+        </div>` : '';
+
+    document.getElementById('yt-polish-result').innerHTML = `
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#27500A;margin-bottom:6px">良くなった点</div>
+        ${goodHTML}
+        ${cautionHTML}
+      </div>
+      <div style="background:#fff;border:1px solid #E8ECF0;border-radius:8px;overflow:hidden">
+        <div style="background:#F8F9FB;padding:8px 12px;border-bottom:1px solid #E8ECF0;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;font-weight:700">さらに磨いた改善版</div>
+          <button class="copy-btn" id="polish-copy" onclick="copyText('polish-improved','polish-copy')">コピー</button>
+        </div>
+        <div style="padding:12px">
+          <textarea class="editable-result" id="polish-improved" rows="5" style="margin-bottom:0">${d.improved||''}</textarea>
+        </div>
+      </div>`;
+
+    document.getElementById('yt-polish-result').style.display = 'block';
+    document.getElementById('yt-polish-result').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    alert('エラーが発生しました。\n' + e.message);
+  }
+
+  clearInterval(interval);
+  btn.disabled = false;
+  btn.innerHTML = '推敲・改善する';
 }
 
 // ===== 引継ぎフォーム =====
