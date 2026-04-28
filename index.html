@@ -480,26 +480,22 @@ async function runYaritori(isRegenerate = false, inheritPrev = false) {
         </div>
         <div class="result-body">
           <textarea class="editable-result" id="yt-best-text" rows="6">${d.best||''}</textarea>
-        </div>
-      </div>
-
-      <div class="result-wrap" style="margin-top:10px">
-        <div class="result-top"><div class="result-title">相手目線のフィードバック</div></div>
-        <div class="result-body">
-          <div style="background:${feedbackColor};border-radius:8px;padding:12px;margin-bottom:${d.feedback?.caution ? '10px' : '0'}">
-            <div style="font-size:11px;font-weight:700;color:${feedbackTextColor};margin-bottom:4px">相手の印象</div>
-            <div style="font-size:13px;color:${feedbackTextColor};line-height:1.6">${d.feedback?.impression||''}</div>
+          <div style="margin-top:10px">
+            <div style="background:${feedbackColor};border-radius:8px;padding:10px 12px;margin-bottom:${d.feedback?.caution ? '8px' : '0'}">
+              <div style="font-size:10px;font-weight:700;color:${feedbackTextColor};margin-bottom:3px">相手の印象</div>
+              <div style="font-size:12px;color:${feedbackTextColor};line-height:1.6">${d.feedback?.impression||''}</div>
+            </div>
+            ${d.feedback?.caution ? `
+            <div style="background:#FAEEDA;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+              <div style="font-size:10px;font-weight:700;color:#633806;margin-bottom:3px">負担になる可能性がある点</div>
+              <div style="font-size:12px;color:#854F0B;line-height:1.6">${d.feedback.caution}</div>
+            </div>` : ''}
+            ${d.feedback?.positive ? `
+            <div style="background:#EAF3DE;border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:#27500A;margin-bottom:3px">良い点</div>
+              <div style="font-size:12px;color:#3B6D11;line-height:1.6">${d.feedback.positive}</div>
+            </div>` : ''}
           </div>
-          ${d.feedback?.caution ? `
-          <div style="background:#FAEEDA;border-radius:8px;padding:12px;margin-top:8px">
-            <div style="font-size:11px;font-weight:700;color:#633806;margin-bottom:4px">負担になる可能性がある点</div>
-            <div style="font-size:13px;color:#854F0B;line-height:1.6">${d.feedback.caution}</div>
-          </div>` : ''}
-          ${d.feedback?.positive ? `
-          <div style="background:#EAF3DE;border-radius:8px;padding:12px;margin-top:8px">
-            <div style="font-size:11px;font-weight:700;color:#27500A;margin-bottom:4px">良い点</div>
-            <div style="font-size:13px;color:#3B6D11;line-height:1.6">${d.feedback.positive}</div>
-          </div>` : ''}
         </div>
       </div>
 
@@ -514,15 +510,17 @@ async function runYaritori(isRegenerate = false, inheritPrev = false) {
               <button class="copy-btn" id="yt-reply-copy" onclick="copyText('yt-reply-text','yt-reply-copy')">コピー</button>
             </div>
             <textarea class="editable-result" id="yt-reply-text" rows="6"></textarea>
-
-            <div style="margin-top:1rem;padding:1rem;background:#F8F9FB;border:1px solid #E8ECF0;border-radius:10px">
-              <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:6px">自分で文章を直した場合、推敲・改善できます</div>
-              <div style="font-size:11px;color:#888;margin-bottom:8px">上の文章を自分なりに修正したら、下に貼り付けてください。どこが良くなったか・さらに改善できるかをフィードバックします。</div>
-              <textarea id="yt-polish-input" rows="4" placeholder="自分で直した文章をここに貼り付けてください..." style="width:100%;font-size:12px;padding:8px 10px;border:1px solid #DDE1E7;border-radius:8px;background:#fff;font-family:inherit;resize:vertical;line-height:1.6;margin-bottom:8px"></textarea>
-              <button id="yt-polish-btn" onclick="runPolish()" style="background:#1A2533;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">推敲・改善する</button>
-              <div id="yt-polish-result" style="display:none;margin-top:1rem"></div>
-            </div>
           </div>
+        </div>
+      </div>
+
+      <div class="result-wrap" style="margin-top:10px">
+        <div class="result-top"><div class="result-title">自分で直した文章を推敲・改善する</div></div>
+        <div class="result-body">
+          <div style="font-size:11px;color:#888;margin-bottom:8px">上の文章を自分なりに修正したら、下に貼り付けてください。どこが良くなったか・さらに改善できるかをフィードバックします。</div>
+          <textarea id="yt-polish-input" rows="4" placeholder="自分で直した文章をここに貼り付けてください..." style="width:100%;font-size:12px;padding:8px 10px;border:1px solid #DDE1E7;border-radius:8px;background:#fff;font-family:inherit;resize:vertical;line-height:1.6;margin-bottom:8px"></textarea>
+          <button id="yt-polish-btn" onclick="runPolish()" style="background:#1A2533;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">推敲・改善する</button>
+          <div id="yt-polish-result" style="display:none;margin-top:1rem"></div>
         </div>
       </div>`;
 
@@ -617,9 +615,6 @@ function selectYtOption(idx) {
   if (opt) {
     document.getElementById('yt-reply-text').value = opt.text || '';
     document.getElementById('yt-reply-area').style.display = 'block';
-    // 推敲エリアをリセット
-    document.getElementById('yt-polish-input').value = '';
-    document.getElementById('yt-polish-result').style.display = 'none';
     document.getElementById('yt-reply-area').scrollIntoView({behavior:'smooth', block:'nearest'});
   }
 }
