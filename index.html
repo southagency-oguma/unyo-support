@@ -856,7 +856,27 @@ function addTask(p) {
 
     <div class="sec">
       <div class="sec-label">⑤ 何をしてほしいか <span class="req">*</span></div>
-      <textarea id="${id}-request" placeholder="例）球団確認後、修正対応をお願いします。修正完了後は本番反映まで進めてください。"></textarea>
+      <textarea id="${id}-request" rows="3" placeholder="例）球団確認後、修正対応をお願いします。修正完了後は本番反映まで進めてください。"></textarea>
+
+      <div style="margin-top:10px;background:#F8F9FB;border:1px solid #E8ECF0;border-radius:8px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:700;color:#666;margin-bottom:8px">作業が発生する場合の対応内容（任意）</div>
+        <div class="field">
+          <label>ブランチ名</label>
+          <input type="text" id="${id}-branch" placeholder="例）feature/REDS_EC-5999">
+        </div>
+        <div class="field">
+          <label>画像対応</label>
+          <div class="radio-row">
+            <label><input type="radio" name="${id}-image" value="なし" checked> なし</label>
+            <label><input type="radio" name="${id}-image" value="上書き"> 上書き</label>
+            <label><input type="radio" name="${id}-image" value="新規アップ"> 新規アップ</label>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>その他の作業・補足</label>
+          <input type="text" id="${id}-work-note" placeholder="例）サーバーの更新が必要・画像フォルダの整理など">
+        </div>
+      </div>
     </div>
 
     <div class="sec" style="margin-bottom:0">
@@ -1034,6 +1054,9 @@ function hikitsugiGenerate() {
         deadline, test: radio(id + '-test'),
         testDate: v(id + '-test-date') ? fmtDate(v(id + '-test-date')) : '',
         detail: v(id + '-detail'), request, risk: v(id + '-risk'), fallback: v(id + '-fallback'),
+        branch: v(id + '-branch'),
+        imageWork: radio(id + '-image') || 'なし',
+        workNote: v(id + '-work-note'),
       });
     });
     projects.push({ name: pName, to: pTo, reason: v(`p${p}-reason`), tasks });
@@ -1101,6 +1124,14 @@ function hikitsugiGenerate() {
       lines.push('');
       lines.push('⑤ 依頼内容');
       lines.push(`　${t.request || '（未入力）'}`);
+      // 作業内容（任意項目・入力がある場合のみ出力）
+      const hasWorkDetail = t.branch || (t.imageWork && t.imageWork !== 'なし') || t.workNote;
+      if (hasWorkDetail) {
+        lines.push('　▼ 作業が発生する場合の対応内容');
+        if (t.branch) lines.push(`　　ブランチ名：${t.branch}`);
+        if (t.imageWork && t.imageWork !== 'なし') lines.push(`　　画像対応：${t.imageWork}`);
+        if (t.workNote) lines.push(`　　その他：${t.workNote}`);
+      }
       lines.push('');
       lines.push('⑥ リスク管理');
       lines.push(`　特記事項：${t.risk || 'なし'}`);
